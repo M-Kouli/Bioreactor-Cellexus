@@ -61,4 +61,4 @@ Contributions to the project are welcome! Please consider the following steps:
 ## Contact
 Your Name - [170026532@dundee.ac.uk](mailto:your-email@example.com)
 
-Project Link: [https://github.com/your-username/bioreactor-controller](https://github.com/your-username/bioreactor-controller)
+Project Link: [https://github.com/M-Kouli/bioreactor-controller](https://github.com/your-username/bioreactor-controller)
