@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioreactor Controller</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;800&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+        * {
+            font-family: "Poppins", "sans-sarif";
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            --bg-color: #fbfbfb;
+            --color-primary: #2d3436;
+            --color-secondary: #252c6a;
+            --border-radius: 4px;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            width: 400px;
+            max-width: 400px;
+            margin: 1rem;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            background: white;
+            box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.2);
+        }
+
+        .form--hidden {
+            display: none;
+        }
+
+        .form>*:first-child {
+            margin-top: 0;
+        }
+
+        .form>*:last-child {
+            margin-bottom: 0;
+        }
+
+        .form__title {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form__input-group {
+            margin-bottom: 1rem;
+        }
+
+        .form__input {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            box-sizing: border-box;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            outline: none;
+            background: #eee;
+            transition: background 0.2s border-color 0.2s;
+        }
+
+        .form__input:focus {
+            border-color: var(--color-primary);
+            background: #fff;
+        }
+
+        .form__button {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+            border: none;
+            border-radius: var(--border-radius);
+            outline: none;
+            cursor: pointer;
+            background: var(--color-primary);
+            -webkit-user-select: none;
+        }
+
+        .form__button:active {
+            transform: scale(0.98);
+        }
+
+        .padding {
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form class="form" id="login" action="/login" method="POST">
+            <h1 class="form__title">Welcome back</h1>
+            <div class="form__input-group">
+                <input type="text" id="username" name="username" class="form__input" autofocus placeholder="Username" required>
+            </div>
+            <div class="form__input-group">
+                <input type="password" id="password" name="password" class="form__input" autofocus placeholder="Password" required>
+                <div class="padding"></div>
+                <a href="#"><button class="form__button" id="loginButton" type="submit">Login</button></a>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

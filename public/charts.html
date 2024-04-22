@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bioreactor Controller</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Link the css file -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <!-- Link the stylesheet for the icons    -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script> <!-- Include Chart.js Zoom and pan plug in-->
+</head>
+
+<body> <!-- Body of the document starts here -->
+  <nav class="sidebar close">
+    <header>
+      <div class="image-text">
+        <span class="image">
+          <img src="logo.png" alt="logo" />
+        </span>
+        <div class="text header-text">
+          <span class="main">KLI Bioreactor</span>
+          <span class="sub">Controller</span>
+        </div>
+      </div>
+      <i class="bx bx-chevron-right toggle"></i>
+    </header>
+
+    <div class="menu-bar">
+      <div class="menu">
+        <ul class="menu-links">
+          <li class="nav-link">
+            <a href="index.html">
+              <i class="bx bx-home-alt icons"></i>
+              <span class="text nav-text">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a href="charts.html">
+              <i class="bx bx-bar-chart-alt-2 icons"></i>
+              <span class="text nav-text">Charts</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a href="logs.html">
+              <i class="bx bx-receipt icons"></i>
+              <span class="text nav-text">Log Files</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a href="logs.html">
+              <i class="bx bx-cog icons"></i>
+              <span class="text nav-text">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="bottom-content">
+        <li class="nav-link">
+          <a href="#" id="logoutBtn">
+            <i class="bx bx-log-out icons"></i>
+            <span class="text nav-text">Log Out</span>
+          </a>
+        </li>
+      </div>
+    </div>
+  </nav>
+  <section class="home-section">
+    <div class="top-nav">
+      <div class="top-control">
+        <i class="bx bx-play" id="startBtn"></i>
+        <span class="stopwatch" id="stopwatch">00:00:00</span>
+        <i class="bx bx-stop" id="stopBtn"></i>
+      </div>
+    </div>
+    <div class="main-sec">
+      <div class="chart-container">
+        <canvas id="myChart"></canvas> <!-- Canvas where the chart will be rendered -->
+      </div>
+    </div>
+  </section>
+  <script src="script.js"></script>
+  <script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Humidity',
+          data: [],
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+          spanGaps: true
+        },
+        {
+          label: 'Temperature',
+          data: [],
+          borderColor: 'rgb(255, 99, 132)',
+          tension: 0.1,
+          spanGaps: true,
+          hidden: true, // Start with the temperature dataset hidden
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            align: 'start',
+            labels: {
+              padding: 20
+            }
+          },
+        },
+      }
+    });
+
+    var ws = new WebSocket('ws://192.168.43.75:8080');
+    ws.onopen = function () {
+      // Function called when the WebSocket connection is established
+      console.log('WebSocket connection established');
+      // Log a message to the browser's console
+      ws.send(JSON.stringify({ command: 'requestState' }));
+    };
+    ws.onmessage = async function (event) {
+      try {
+        let data;
+        if (event.data instanceof Blob) {
+          // If the received data is a Blob, convert it to text
+          const text = await event.data.text();
+          data = JSON.parse(text);
+        } else {
+          // If it's not a Blob, assume it's already a text and parse it as JSON
+          data = JSON.parse(event.data);
+          updateStopwatchDisplay(data);
+        };
+        console.log('Parsed data:', data); // Log to see the parsed data
+        var currentTime = new Date().toLocaleTimeString(); // Or use message.label if it's a timestamp
+
+        if (chart.data.labels.length > 50) {
+          // If there are more than 50 labels, remove the oldest one to maintain a sliding window of the latest 50 data points.
+          chart.data.labels.shift();
+          // This does it for every dataset present
+          chart.data.datasets.forEach((dataset) => {
+            dataset.data.shift();
+          });
+        }
+        chart.data.labels.push(currentTime); // Add new label
+        chart.data.datasets[0].data.push(data.humidity); // Update Humidity dataset
+        chart.data.datasets[1].data.push(data.temperature); // Update Temperature dataset
+        chart.update();
+      } catch (e) {
+        console.error('Error parsing message JSON:', e);
+      }
+    }
+    // Start fetching historical data from the API endpoint.
+    fetch('/api/data')
+      .then(response => response.json()) // Parse the JSON response from the server.
+      .then(data => {
+        // Check if the response contains data.
+        if (data && data.data) {
+          // Convert each timestamp to a localized time string and save them as labels.
+          const labels = data.data.map(item => new Date(item.timestamp).toLocaleTimeString());
+          // Extract humidity and temprature data from the response.
+          const humidityData = data.data.map(item => item.humidity);
+          const temperatureData = data.data.map(item => item.temperature);
+
+          // Assign the labels and data to the chart's dataset.
+          chart.data.labels = labels;
+          chart.data.datasets[0].data = humidityData;
+          chart.data.datasets[1].data = temperatureData;
+
+          // Update the chart
+          chart.update();
+        }
+      })
+      .catch(error => {
+        // Log an error message 
+        console.error('Error fetching historical data:', error);
+      });
+  </script>
+</body>
+
+</html>

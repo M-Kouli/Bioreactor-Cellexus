@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bioreactor Controller</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+
+</head>
+
+<body>
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <img src="logo.png" alt="logo" />
+                </span>
+                <div class="text header-text">
+                    <span class="main">KLI Bioreactor</span>
+                    <span class="sub">Controller</span>
+                </div>
+            </div>
+            <i class="bx bx-chevron-right toggle"></i>
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu">
+                <ul class="menu-links">
+                    <li class="nav-link">
+                        <a href="index.html">
+                            <i class="bx bx-home-alt icons"></i>
+                            <span class="text nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="charts.html">
+                            <i class="bx bx-bar-chart-alt-2 icons"></i>
+                            <span class="text nav-text">Charts</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="logs.html">
+                            <i class="bx bx-receipt icons"></i>
+                            <span class="text nav-text">Log Files</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="logs.html">
+                            <i class="bx bx-cog icons"></i>
+                            <span class="text nav-text">Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bottom-content">
+                <li class="nav-link">
+                    <a href="#" id="logoutBtn">
+                        <i class="bx bx-log-out icons"></i>
+                        <span class="text nav-text">Log Out</span>
+                    </a>
+                </li>
+            </div>
+        </div>
+    </nav>
+    <section class="home-section">
+        <div class="top-nav">
+            <div class="top-control">
+                <i class="bx bx-play" id="startBtn"></i>
+                <span class="stopwatch" id="stopwatch">00:00:00</span>
+                <i class="bx bx-stop" id="stopBtn"></i>
+            </div>
+        </div>
+        <div class="main-sec">
+            <div class="log-container">
+                <table id="tablesList" class="tablelog">
+                    <thead>
+                        <tr>
+                            <th>Stored Data Name</th>
+                            <th>Files</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <script src="script.js"></script>
+    <script>
+        // Fetch list of archived tables from the server using the '/api/tables' endpoint.
+        fetch('/api/tables')
+            .then(response => response.json()) // Convert the fetch response to JSON.
+            .then(tables => { // Process the JSON data containing the tables.
+                const tbody = document.getElementById('tablesList').querySelector('tbody'); // Select the tbody element within the table with id 'tablesList'.
+                tables.forEach(table => { // Iterate over each table received from the server.
+                    const row = tbody.insertRow(); // Insert a new row into the tbody for each table.
+                    const nameCell = row.insertCell(); // Create a new cell in the row for the table name.
+                    nameCell.textContent = table.name; // Set the text content of the name cell to the table's name.
+
+                    const actionCell = row.insertCell(); // Create another cell in the row for the action (download link).
+                    const wrapperDiv = document.createElement('div'); // Create a div to wrap the download link and icon.
+                    wrapperDiv.className = 'downloadContainer'; // Assign a class name to the wrapper div for potential styling.
+
+                    const downloadLink = document.createElement('a'); // Create an anchor element for the download link.
+                    downloadLink.href = `/api/data/${table.name}`; // Set the href of the link to the API endpoint for downloading table data.
+                    downloadLink.textContent = 'Download CSV'; // Set the text content of the link.
+                    downloadLink.className = 'download-link'; // Assign a class name to the download link for styling.
+
+                    const icon = document.createElement('i'); // Create an <i> element to serve as the download icon.
+                    icon.className = 'bx bx-download'; // Add classes to the icon for styling and to specify which icon to use.
+
+                    // Append the download link and the icon to the wrapper div.
+                    wrapperDiv.appendChild(downloadLink);
+                    wrapperDiv.appendChild(icon);
+
+                    // Add a click event listener to the wrapper div.
+                    // This event listener triggers the download of the table data as a CSV when clicked.
+                    wrapperDiv.addEventListener('click', function (e) {
+                        e.preventDefault(); // Prevent the default anchor tag click behavior.
+                        downloadTableAsCSV(table.name); // Call the function to handle the CSV download.
+                    });
+
+                    // Append the wrapper div (containing the download link and icon) to the action cell of the table row.
+                    actionCell.appendChild(wrapperDiv);
+                });
+            });
+
+
+        // Function to download table data as CSV
+        function downloadTableAsCSV(tableName) {
+            // Send a request to the server to get the data of a specific table by its name.
+            fetch(`/api/data/${tableName}`)
+                .then(response => response.json()) // Convert the response to JSON format.
+                .then(data => {
+                    // Convert the received data into a CSV formatted string.
+                    const csv = dataToCSV(data);
+                    // Create a new Blob object containing the CSV data with the type set to 'text/csv'.
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    // Create a temporary anchor (<a>) element.
+                    const link = document.createElement("a");
+                    // Create an object URL for the Blob object and set it as the href of the anchor element.
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    // Set the download attribute on the anchor element to set a filename for the downloaded file.
+                    link.setAttribute("download", `${tableName}.csv`);
+                    // Make the anchor element invisible to avoid altering the layout.
+                    link.style.visibility = 'hidden';
+                    // Append the anchor element to the body of the document.
+                    document.body.appendChild(link);
+                    // Click the anchor element to trigger the download.
+                    link.click();
+                    // Remove the anchor element from the document body to clean up.
+                    document.body.removeChild(link);
+                });
+        }
+
+
+        // Function to convert an array of data objects to a CSV string.
+        function dataToCSV(data) {
+            // Extract the keys from the first data object to use as CSV headers.
+            const header = Object.keys(data[0]).join(',');
+            // Map each data object to a CSV string, joining object values with commas.
+            const rows = data.map(row => Object.values(row).join(','));
+            // Combine the header and rows, separated by newlines, to form the full CSV string.
+            return [header, ...rows].join('\n');
+        }
+
+        // Start of the script tag for JavaScript code
+        const ws = new WebSocket('ws://192.168.43.75:8080');
+        // Create a new WebSocket connection to the specified server address
+        // we use const because we dont want the value of ws to change
+
+        ws.onopen = function () {
+            // Function called when the WebSocket connection is established
+            console.log('WebSocket connection established');
+            // Log a message to the browser's console
+            ws.send(JSON.stringify({ command: 'requestState' }));
+        };
+        // Function to handle incoming messages
+        ws.onmessage = async function (event) {
+            try {
+                let data;
+                data = JSON.parse(event.data);
+                updateStopwatchDisplay(data);
+                console.log('Parsed data:', data); // Log to see the parsed data
+            } catch (e) {
+                console.error('Error parsing message JSON:', e);
+            }
+        };
+    </script>
+</body>
+
+</html>
