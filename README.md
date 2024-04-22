@@ -1,6 +1,3 @@
-Certainly! Here's a complete README file in Markdown format tailored for your GitHub repository, detailing the setup and use of the bioreactor controller project:
-
-```markdown
 # Bioreactor Controller
 
 ## Introduction
