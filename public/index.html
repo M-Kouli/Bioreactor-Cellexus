@@ -93,9 +93,9 @@
             <div class="speedbox__score1" id="speedbox-Hum1"></div>
             <div class="speedbox__groove"></div>
             <div class="speedbox__odo">
-              <div class="speedbox__ping">38<span> %</span></div>
+              <div class="speedbox__ping">0.0<span> %</span></div>
               <hr class="speedo">
-              <div class="speedbox__down"><span style="font-size: 25px;" id="humidity">14.5</span><span> %</span></div>
+              <div class="speedbox__down"><span style="font-size: 25px;" id="humidity">0.0</span><span> %</span></div>
             </div>
             <div class="speedbox__base"><span
                 style="float: left; padding: 15px; font-size: 14px; font-weight: 500;">SP/<span
@@ -110,9 +110,9 @@
             <div class="speedbox__score1" id="speedbox-temp1"></div>
             <div class="speedbox__groove"></div>
             <div class="speedbox__odo">
-              <div class="speedbox__ping">27<span> °C</span></div>
+              <div class="speedbox__ping">0.0<span> °C</span></div>
               <hr class="speedo">
-              <div class="speedbox__down"><span style="font-size: 25px;" id="temperature">32.4</span><span> °C</span>
+              <div class="speedbox__down"><span style="font-size: 25px;" id="temperature">0.0</span><span> °C</span>
               </div>
             </div>
             <div class="speedbox__base"><span
@@ -124,8 +124,8 @@
           <div class="inner-box1">
             <div class="speedo-desc"><i class='bx bx-droplet'></i><span>pH</span></div>
             <span style="font-weight: 500;"><span style="font-size: 10px;">RV </span><span
-                style="color: #23576f; font-size: 20px; padding-right: 10px;" id="pH">7.00</span><span
-                style="font-size: 10px;">SP</span><span style="font-size: 15px;">7.00</span></span>
+                style="color: #23576f; font-size: 20px; padding-right: 10px;" id="pH">0.00</span><span
+                style="font-size: 10px;">SP</span><span style="font-size: 15px;">0.00</span></span>
             <div class="skill-main">
               <div class="skill-wrrap">
                 <div class="skill-bar">
@@ -144,8 +144,8 @@
           <div class="inner-box">
             <div class="speedo-desc"><i class='bx bx-water'></i><span>Water Level</span></div>
             <span style="font-weight: 500;"><span style="font-size: 10px;">RV </span><span
-                style="color: #23576f; font-size: 20px; padding-right: 10px;" id="water-level">73.0</span><span
-                style="font-size: 10px;">SP</span><span style="font-size: 15px;">95.00</span></span>
+                style="color: #23576f; font-size: 20px; padding-right: 10px;" id="water-level">0.00</span><span
+                style="font-size: 10px;">SP</span><span style="font-size: 15px;">0.00</span></span>
             <div class="skill-main">
               <div class="skill-wrrap">
                 <div class="skill-bar">
@@ -275,22 +275,22 @@
           // Update the webpage with the temperature and humidity
           document.getElementById('temperature').textContent = data.temperature.toFixed(2);
           document.getElementById('humidity').textContent = data.humidity.toFixed(2);
-          // let updatedHum
-          // speed.keyup(function () {
-          //   updatedHum = Math.round(data.humidity.toFixed(2) * 180 / 100) - 45;
+          let updatedHum
+          speed.keyup(function () {
+            updatedHum = Math.round(data.humidity.toFixed(2) * 180 / 100) - 45;
 
-          //   $("#speedbox-Hum").css("transform", "rotate(" + updatedHum + "deg)");
-          // });
-          // let updatedtemp
-          // speed.keyup(function () {
-          //   updatedtemp = Math.round(data.temperature.toFixed(2) * 180 / 100) - 45;
+            $("#speedbox-Hum").css("transform", "rotate(" + updatedHum + "deg)");
+          });
+          let updatedtemp
+          speed.keyup(function () {
+            updatedtemp = Math.round(data.temperature.toFixed(2) * 180 / 100) - 45;
 
-          //   $("#speedbox-temp").css("transform", "rotate(" + updatedtemp + "deg)");
-          // });
-          // document.getElementById('pH').textContent = data.temperature.toFixed(2);
-          // document.getElementById('water-level').textContent = data.humidity.toFixed(2);
-          // document.getElementById('pH-bar').style.width = data.temperature.toFixed(2) + "%";
-          // document.getElementById('water-level-bar').style.width = data.temperature.toFixed(2) + "%";
+            $("#speedbox-temp").css("transform", "rotate(" + updatedtemp + "deg)");
+          });
+          document.getElementById('pH').textContent = data.temperature.toFixed(2);
+          document.getElementById('water-level').textContent = data.humidity.toFixed(2);
+          document.getElementById('pH-bar').style.width = data.temperature.toFixed(2) + "%";
+          document.getElementById('water-level-bar').style.width = data.temperature.toFixed(2) + "%";
         } catch (e) {
           console.error('Error in sesnor data JSON:', e);
         }
@@ -298,30 +298,6 @@
         console.error('Error parsing message JSON:', e);
       }
     };
-  </script>
-  <script>
-      let updatedHum
-      updatedHum = Math.round(19.5 * 180 / 100) - 45;
-
-      $("#speedbox-Hum").css("transform", "rotate(" + updatedHum + "deg)");
-      let updatedtemp
-      updatedtemp = Math.round(32.4 * 180 / 100) - 45;
-
-      $("#speedbox-temp").css("transform", "rotate(" + updatedtemp + "deg)");
-      let updatedHum1
-      updatedHum1 = Math.round(38 * 180 / 100) - 45;
-
-      $("#speedbox-Hum1").css("transform", "rotate(" + updatedHum1 + "deg)");
-      let updatedtemp1
-      updatedtemp1 = Math.round(27 * 180 / 100) - 45;
-
-      $("#speedbox-temp1").css("transform", "rotate(" + updatedtemp1 + "deg)");
-      // document.getElementById('pH').textContent = data.temperature.toFixed(2);
-      // document.getElementById('water-level').textContent = data.humidity.toFixed(2);
-      document.getElementById('pH-bar').style.width = (7/14)*100 + "%";
-      document.getElementById('water-level-bar').style.width = 73 + "%";
-      document.getElementById('pH-bar-static').style.width = (7/14)*100 + "%";
-      document.getElementById('water-level-bar-static').style.width = 95 + "%";
   </script>
 </body>
 <!-- End of the document body -->
