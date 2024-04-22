@@ -42,6 +42,13 @@ node server.js
 
 After starting the server, open a web browser and navigate to `http://localhost:8080` to view the dashboard.
 
+## Result
+![Dash1](Dash1.png)
+![Dash2](Dash2.png)
+![Charts](Charts.png)
+![Logs](Logs.png)
+![Login](Login.png)
+
 ## Features
 - Real-time monitoring of bioreactor conditions.
 - Interactive control panel for manual adjustments.
